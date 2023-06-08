@@ -1,4 +1,3 @@
-using TMPro;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,12 +8,9 @@ namespace RPG.Enemy
     [SelectionBase, DisallowMultipleComponent, RequireComponent(typeof(Outline)), RequireComponent(typeof(NavMeshAgent))]
     public class Enemy : NetworkBehaviour, IDamageable
     {
-        [SerializeField] private TextMeshProUGUI enemyIDLabel; //DEBUG
+        [SerializeField] internal EnemyData enemyData;
 
-        [SerializeField] private EnemyData enemyData;
-
-        internal NavMeshAgent navMeshAgent { get; private set; }
-        internal CharacterAnimations animations { get; private set; }
+        internal CharacterAnimations animations;
 
         [Header("Enemy AI")]
         internal IdleStateAI idleState;
@@ -22,22 +18,33 @@ namespace RPG.Enemy
         internal AttackStateAI attackState;
         internal IEnemyAI currentState;
 
-        internal Transform target;
-        internal Transform startPosition;
+        [Header("Attack")]
+        [SerializeField] internal ClientCharacter target;
+        [SerializeField] internal float attackCooldown;
+
+        [Header("Navigation")]
+        internal NavMeshAgent navMeshAgent;
+        internal Transform enemyTransform;
+        internal Vector3 startPosition;
 
         private Outline outline;
+        private Collider enemyColider;
+
         private NetworkVariable<float> netHealth = new NetworkVariable<float>(0);
 
         private void Awake()
         {
+            enemyTransform = transform;
+            startPosition = transform.position;
+
             navMeshAgent = GetComponent<NavMeshAgent>();
             animations = new CharacterAnimations(GetComponentInChildren<Animator>(), GetComponentInChildren<ClientNetworkAnimator>());
+            enemyColider = GetComponent<Collider>();
             outline = GetComponent<Outline>();
 
             idleState = new IdleStateAI(this);
             chaseState = new ChaseStateAI(this);
             attackState = new AttackStateAI(this);
-            startPosition = transform;
         }
 
         public override void OnNetworkSpawn()
@@ -47,19 +54,12 @@ namespace RPG.Enemy
             netHealth.Value = enemyData.baseHealth;
             outline.enabled = false;
 
-            currentState = chaseState;
+            currentState = idleState;
+            attackCooldown = enemyData.attackCooldown;
         }
 
-        private void Update() //TODO: usunac po stworzeniu zarzadzania enemies
-        {
-            EnemyUpdate();
-        }
-
-        public void EnemyUpdate()
-        {
-            //currentState.UpdateAction();
-            animations.Movement(navMeshAgent.velocity.magnitude);
-        }
+        private void Update() => currentState.UpdateAction();
+        private void LateUpdate() => animations.Movement(navMeshAgent.velocity.magnitude);
 
         private void OnMouseEnter() => outline.enabled = true;
         private void OnMouseExit() => outline.enabled = false;
@@ -89,16 +89,12 @@ namespace RPG.Enemy
         [ClientRpc]
         private void KillEnemyClientRpc()
         {
+            StopAllCoroutines();
             animations.Death();
-        }
 
-
-
-        private void LateUpdate()
-        {
-            enemyIDLabel.text = netHealth.Value.ToString();
-            enemyIDLabel.transform.LookAt(Camera.main.transform.position);
-            enemyIDLabel.transform.Rotate(new Vector3(0f, 180f, 0f));
+            enemyColider.enabled = false;
+            navMeshAgent.enabled = false;
+            enabled = false;
         }
     }
 }

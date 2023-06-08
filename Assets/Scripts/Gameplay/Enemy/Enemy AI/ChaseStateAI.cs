@@ -15,20 +15,30 @@ namespace RPG.Enemy
             ChaseEnemy();
         }
 
-        public void ChaseState() => enemy.currentState = enemy.chaseState;
-        public void IdleState() => enemy.currentState = enemy.idleState;
-        public void AttackState() => enemy.currentState = enemy.attackState;
+        #region Interface
+        public void ToChaseState() => enemy.currentState = enemy.chaseState;
+        public void ToIdleState() => enemy.currentState = enemy.idleState;
+        public void ToAttackState() => enemy.currentState = enemy.attackState;
+        #endregion
 
         private void ChaseEnemy()
         {
-            enemy.target = Object.FindFirstObjectByType<PlayerNetwork>().transform;
-            if (enemy.target == null) return;
+            if (enemy.target == null) ToIdleState();
 
-            enemy.navMeshAgent.destination = enemy.target.position;
+            var distance = Vector3.Distance(enemy.target.transform.position, enemy.enemyTransform.position);
 
-            if (Vector3.Distance(enemy.transform.position, enemy.target.position) <= 2f)
+            enemy.navMeshAgent.destination = enemy.target.transform.position;
+
+            if (distance <= enemy.enemyData.attackRange)
             {
-                AttackState();
+                enemy.navMeshAgent.destination = enemy.enemyTransform.position;
+                ToAttackState();
+            }
+
+            else if (distance > enemy.enemyData.surveillanceRange)
+            {
+                enemy.target = null;
+                ToIdleState();
             }
         }
     }

@@ -27,7 +27,7 @@ public class Item : NetworkBehaviour, IInteractable
     private void OnMouseOver() => outline.enabled = true;
     private void OnMouseExit() => outline.enabled = false;
 
-    public void Interact(PlayerNetwork player)
+    public void Interact(ClientCharacter player)
     {
         outline.enabled = false;
         player.Inventory.PickupItem(this);
@@ -45,6 +45,11 @@ public class Item : NetworkBehaviour, IInteractable
     private void PickUpItemClientRPC()
     {
         //Destroy(gameObject);
+    }
+
+    public bool IsInteractable()
+    {
+        return true;
     }
 }
 

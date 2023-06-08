@@ -76,10 +76,11 @@ public class PlayerController : NetworkBehaviour
     private void Interaction(RaycastHit target, IInteractable interactable)
     {
         Debug.Log("Interact");
-
+        if (!interactable.IsInteractable()) return;
+        
         playerTransform.LookAt(target.transform);
 
-        interactable.Interact(GetComponent<PlayerNetwork>()); // cache player
+        interactable.Interact(GetComponent<ClientCharacter>()); // cache player
         if (IsOwner) animations.Interact();
     }
 

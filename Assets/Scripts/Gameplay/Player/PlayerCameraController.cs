@@ -11,7 +11,7 @@ public class PlayerCameraController : MonoBehaviour
 
     private void Awake() => cameraTransform = transform;
 
-    private void Update()
+    private void LateUpdate()
     {
         cameraTransform.position = player.position + cameraOffsetPosition;
         cameraTransform.rotation = Quaternion.Euler(cameraOffsetRotation);

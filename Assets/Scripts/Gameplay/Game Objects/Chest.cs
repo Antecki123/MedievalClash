@@ -29,7 +29,7 @@ public class Chest : NetworkBehaviour, IInteractable
     private void OnMouseOver() => outline.enabled = !netIsOpen.Value;
     private void OnMouseExit() => outline.enabled = false;
 
-    public void Interact(PlayerNetwork player)
+    public void Interact(ClientCharacter player)
     {
         if (netIsOpen.Value) return;
 
@@ -59,5 +59,11 @@ public class Chest : NetworkBehaviour, IInteractable
     private void OpenChestClientRpc()
     {
         animator.SetTrigger(openState);
+        enabled = false;
+    }
+
+    public bool IsInteractable()
+    {
+        return !netIsOpen.Value;
     }
 }

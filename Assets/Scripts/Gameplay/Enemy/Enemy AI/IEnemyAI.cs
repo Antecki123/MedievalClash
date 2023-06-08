@@ -1,7 +1,8 @@
 public interface IEnemyAI
 {
     public void UpdateAction();
-    public void IdleState();
-    public void ChaseState();
-    public void AttackState();
+
+    public void ToIdleState();
+    public void ToChaseState();
+    public void ToAttackState();
 }

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd99e8d45931453468d4eb440cd218bd, type: 3}
   m_Name: Enemy Data
   m_EditorClassIdentifier: 
-  enemyName: Girlbrush
-  velocity: 5
-  baseHealth: 100
+  enemyName: Minotaur
+  velocity: 4
+  baseHealth: 20
+  surveillanceRange: 5
   attackRange: 1
-  attackCooldown: 2
+  attackCooldown: 3

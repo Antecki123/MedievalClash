@@ -1,4 +1,6 @@
 public interface IInteractable
 {
-    public void Interact(PlayerNetwork player);
+    public void Interact(ClientCharacter player);
+
+    public bool IsInteractable();
 }

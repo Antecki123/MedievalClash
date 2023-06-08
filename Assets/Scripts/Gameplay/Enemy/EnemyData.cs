@@ -12,6 +12,7 @@ public class EnemyData : ScriptableObject
     public float baseHealth = 100f;
 
     [Header("Attack")]
+    public float surveillanceRange = 5.0f;
     public float attackRange = 1f;
     public float attackCooldown = 2.0f;
 }
